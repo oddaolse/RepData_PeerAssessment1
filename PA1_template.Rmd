@@ -7,19 +7,61 @@ output:
 
 
 ## Loading and preprocessing the data
+```{r}
+library(dplyr)
+myData <- read.csv(".\\Data\\activity.csv", colClasses = c("integer", "Date", "factor"))
 
+
+by_days <- group_by(myData, date)
+aggregated_data <- summarise(by_days, sum_steps = sum(steps))
+stepsData <- aggregated_data$sum_steps
+
+```
 
 
 ## What is mean total number of steps taken per day?
 
+```{r}
+library(ggplot2)
+graph1 <- qplot(stepsData, binwidth = 1000, xlab = "total number of steps taken each day") 
+print(graph1)
+
+meanSteps <- mean(stepsData, na.rm = TRUE)
+print(meanSteps)
+medianSteps <- median(stepsData, na.rm = TRUE)
+print(medianSteps)
+```
 
 
 ## What is the average daily activity pattern?
 
+```{r}
+omitData <- na.omit(myData)
+by_interval <- group_by(omitData, interval)
+aggregated_interval_data <- summarise(by_interval, sum_steps = sum(steps))
+intervalData <- aggregated_interval_data$sum_steps
+graph2 <- qplot(intervalData, binwidth = 1000, xlab = "total number of steps taken per interval") 
+print(graph2)
+```
+
+
+## How many missing values
+```{r}
+missing <- is.na(myData$steps)
+table(missing)
+```
 
 
 ## Imputing missing values
-
+```{r}
+```
+Not implemented
 
 
 ## Are there differences in activity patterns between weekdays and weekends?
+```{r}
+```
+Not implemented
+
+
+### Not completed assignment.
