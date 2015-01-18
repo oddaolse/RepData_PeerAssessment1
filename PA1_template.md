@@ -6,7 +6,8 @@ output: html_document
 
 
 ## Loading and preprocessing the data
-```{r}
+
+```r
 library(dplyr)
 myData <- read.csv(".\\Data\\activity.csv")
 
@@ -17,19 +18,36 @@ stepsData <- aggregated_data$sum_steps
 ```
 
 ## Mean total number of steps per day
-```{r}
+
+```r
 library(ggplot2)
 graph1 <- qplot(stepsData, binwidth = 1000, xlab = "total number of steps taken each day") 
 print(graph1)
+```
 
+![plot of chunk unnamed-chunk-2](figure/unnamed-chunk-2-1.png) 
+
+```r
 meanSteps <- mean(stepsData, na.rm = TRUE)
 print(meanSteps)
+```
+
+```
+## [1] 10766.19
+```
+
+```r
 medianSteps <- median(stepsData, na.rm = TRUE)
 print(medianSteps)
 ```
 
+```
+## [1] 10765
+```
+
 ## Daily average activity pattern
-```{r}
+
+```r
 # aggregated_inteval_data - number of steps per time interval
 omitData <- na.omit(myData)
 by_interval <- group_by(omitData, interval)
@@ -39,23 +57,34 @@ intervalData <- aggregated_interval_data$sum_steps
 plot(aggregated_interval_data$interval,aggregated_interval_data$sum_steps, type="l", 
      xlab="Interval", ylab="Number of Steps",main="Average Number of Steps per Day by Interval")
 ```
+
+![plot of chunk unnamed-chunk-3](figure/unnamed-chunk-3-1.png) 
 ## Imputing missing values
 
 ### How many missing values
-```{r}
+
+```r
 missing <- is.na(myData$steps)
 table(missing)
 ```
 
+```
+## missing
+## FALSE  TRUE 
+## 15264  2304
+```
+
 ### Devise strategy for filling in all of the missing numbers
-```{r}
+
+```r
 # intervalAvgData - mean number of steps per time interval
 by_interval_avg <- group_by(omitData, interval)
 intervalAvgData <- summarise(by_interval_avg, avgSteps = mean(steps) )
 ```
 
 ### Create a new dataset that is equal to the original dataset but with the missing data filled in
-```{r}
+
+```r
 #imputed - myData with one added column - the mean number of steps for that time interval
 mrg <- merge.data.frame(myData, intervalAvgData, by = "interval")
 imputed <- mutate(mrg, imputed_steps = ifelse(is.na(mrg$steps), avgSteps, mrg$steps ))
@@ -63,27 +92,42 @@ imputed <- mutate(mrg, imputed_steps = ifelse(is.na(mrg$steps), avgSteps, mrg$st
 
 ### Histogram of the total number of steps taken each day
 
-```{r}
+
+```r
 by_days <- group_by(imputed, date)
 aggregated_imputed_data <- summarise(by_days, sum_steps = sum(steps), sumImpSteps = sum(imputed_steps))
 mStepsData <- aggregated_imputed_data$sumImpSteps
 qplot(mStepsData, binwidth = 1000, xlab = "total number of steps taken each day (with replaced missing values)") 
-
 ```
+
+![plot of chunk unnamed-chunk-7](figure/unnamed-chunk-7-1.png) 
 
 
 
 ### Mean and median
-```{r}
+
+```r
 meanImputedSteps <- mean(mStepsData, na.rm = TRUE)
 print(meanImputedSteps)
+```
+
+```
+## [1] 10766.19
+```
+
+```r
 medianImputedSteps <- median(mStepsData, na.rm = TRUE)
 print(medianImputedSteps)
 ```
 
+```
+## [1] 10766.19
+```
+
 
 ## Diference in activity pattern between weekdays and weekends
-```{r}
+
+```r
 library(lubridate)
 weekdays <- mutate(omitData, dateField = as.Date(date) )
 weekdays <- mutate(weekdays, weekday = wday(dateField))
@@ -98,8 +142,9 @@ xyplot(avg_steps~interval | weekend, data = aggregated_weekend,
        xlab = 'Interval',
        ylab = 'Number of Steps',
        layout = c(1,2))
-
 ```
+
+![plot of chunk unnamed-chunk-9](figure/unnamed-chunk-9-1.png) 
 
 
 
